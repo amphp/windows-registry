@@ -1,6 +1,6 @@
 <?php
 
-namespace Kelunik\WindowsRegistry;
+namespace Amp\WindowsRegistry;
 
 use Amp;
 

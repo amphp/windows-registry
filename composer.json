@@ -1,5 +1,5 @@
 {
-    "name": "kelunik/windows-registry",
+    "name": "amphp/windows-registry",
     "description": "Windows Registry Reader.",
     "type": "library",
     "require": {
@@ -15,7 +15,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Kelunik\\WindowsRegistry\\": "src"
+            "Amp\\WindowsRegistry\\": "src"
         }
     }
 }

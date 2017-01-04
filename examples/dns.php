@@ -1,6 +1,6 @@
 <?php
 
-use Kelunik\WindowsRegistry\KeyNotFoundException;
+use Amp\WindowsRegistry\KeyNotFoundException;
 
 require __DIR__ . "/../vendor/autoload.php";
 
@@ -12,7 +12,7 @@ Amp\run(function () {
         "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\DhcpNameServer",
     ];
 
-    $reader = new Kelunik\WindowsRegistry\WindowsRegistry;
+    $reader = new Amp\WindowsRegistry\WindowsRegistry;
     $value = null;
 
     try {
