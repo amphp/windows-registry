@@ -7,6 +7,10 @@ use Amp;
 class WindowsRegistry {
     public function read($key) {
         return Amp\resolve(function () use ($key) {
+            if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+                throw new \RuntimeException("Not running on Windows.");
+            }
+
             $parts = explode("\\", $key = strtr($key, "/", "\\"));
 
             $value = array_pop($parts);
@@ -16,11 +20,14 @@ class WindowsRegistry {
 
             $result = yield $process->exec(Amp\Process::BUFFER_ALL);
 
-            var_dump($result);
+            if ($result->exit !== 0) {
+                $debugInfo = "EXIT: {$result->exit}\n\nSTDOUT\n======\n\n{$result->stdout}\n\nSTDERR\n======\n\n{$result->stderr}\n";
+                throw new \RuntimeException("Unknown error file getting key '{$key}\\{$value}'.\n\n$debugInfo");
+            }
 
             $lines = explode("\n", str_replace("\r", "", $result->stdout));
             $lines = array_filter($lines, function ($line) {
-                return strlen($line) && $line[0] !== " ";
+                return strlen($line) && $line[0] === " ";
             });
 
             $values = array_map(function ($line) {
