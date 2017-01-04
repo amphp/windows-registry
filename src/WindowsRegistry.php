@@ -18,7 +18,7 @@ class WindowsRegistry {
 
             $process = new Amp\Process(["reg", "query", $key]);
 
-            $result = yield $process->exec(Amp\Process::BUFFER_ALL);
+            $result = (yield $process->exec(Amp\Process::BUFFER_ALL));
 
             if ($result->exit !== 0) {
                 $debugInfo = "EXIT: {$result->exit}\n\nSTDOUT\n======\n\n{$result->stdout}\n\nSTDERR\n======\n\n{$result->stderr}\n";
