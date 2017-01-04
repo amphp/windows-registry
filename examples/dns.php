@@ -6,7 +6,7 @@ require __DIR__ . "/../vendor/autoload.php";
 
 Amp\run(function () {
     $userKey = "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Nameserver";
-    $dhcpKey = "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\DhcpNameserver";
+    $dhcpKey = "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\DhcpNameServer";
 
     var_dump(yield (new Kelunik\WindowsRegistry\WindowsRegistry())->read($dhcpKey));
 });
