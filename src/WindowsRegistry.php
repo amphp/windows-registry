@@ -24,7 +24,7 @@ class WindowsRegistry {
             });
 
             $values = array_map(function ($line) {
-                return preg_split("\\s+", $line, 3);
+                return preg_split("(\\s+)", $line, 3);
             }, $lines);
 
             foreach ($values as $v) {
