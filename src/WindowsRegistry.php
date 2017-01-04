@@ -12,14 +12,28 @@ class WindowsRegistry {
             $value = array_pop($parts);
             $key = implode("\\", $parts);
 
-            $process = new Amp\Process(["cmd", "/c", dirname(__DIR__) . "\\res\\read.bat"], [
-                "env" => [
-                    "KEY_NAME" => $key,
-                    "VALUE_NAME" => $value,
-                ],
-            ]);
+            $process = new Amp\Process(["reg", "query", $key]);
 
-            return yield $process->exec(Amp\Process::BUFFER_ALL);
+            $result = yield $process->exec(Amp\Process::BUFFER_ALL);
+
+            var_dump($result);
+
+            $lines = explode("\n", str_replace("\r", "", $result->stdout));
+            $lines = array_filter($lines, function ($line) {
+                return strlen($line) && $line[0] !== " ";
+            });
+
+            $values = array_map(function ($line) {
+                return preg_split("\\s+", $line, 3);
+            }, $lines);
+
+            foreach ($values as $v) {
+                if ($v[0] === $value) {
+                    return $v[2];
+                }
+            }
+
+            throw new KeyNotFoundException("Windows registry key '{$key}\\{$value}' not found.");
         });
     }
 }
