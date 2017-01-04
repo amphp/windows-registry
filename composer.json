@@ -4,6 +4,7 @@
     "type": "library",
     "require": {
         "php": ">=5.5",
+        "amphp/amp": "^1.2",
         "amphp/process": "^0.1.3"
     },
     "license": "MIT",
