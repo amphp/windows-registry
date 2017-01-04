@@ -3,6 +3,7 @@
     "description": "Windows Registry Reader.",
     "type": "library",
     "require": {
+        "php": ">=5.5",
         "amphp/process": "^0.1.3"
     },
     "license": "MIT",

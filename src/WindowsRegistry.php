@@ -36,7 +36,8 @@ class WindowsRegistry {
 
             foreach ($values as $v) {
                 if ($v[0] === $value) {
-                    return $v[2];
+                    yield new Amp\CoroutineResult($v[2]);
+                    return;
                 }
             }
 
