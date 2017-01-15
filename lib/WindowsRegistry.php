@@ -2,13 +2,11 @@
 
 namespace Amp\WindowsRegistry;
 
-use Amp\{ Coroutine, Listener };
-use Amp\Parallel\Process\StreamedProcess;
+use Amp\Coroutine;
+use Amp\Process\StreamedProcess;
 use AsyncInterop\Promise;
 
 class WindowsRegistry {
-    const CHUNK_SIZE = 8192;
-
     public function read(string $key): Promise {
         return new Coroutine($this->fetch($key));
     }
@@ -39,23 +37,20 @@ class WindowsRegistry {
     }
 
     private function getKeys(string $key): \Generator {
-        if (\strtoupper(\substr(PHP_OS, 0, 3)) !== 'WIN') {
-            throw new \RuntimeException("Not running on Windows.");
+        if (\strtoupper(\substr(\PHP_OS, 0, 3)) !== 'WIN') {
+            throw new \Error("Not running on Windows.");
         }
 
         $key = \strtr($key, "/", "\\");
 
         $cmd = \sprintf("reg query %s", \escapeshellarg($key));
         $process = new StreamedProcess($cmd);
-        $process->start();
+        $promise = $process->execute();
 
-        $stdout = new Listener($process->getStdOut());
-        $stderr = new Listener($process->getStdErr());
+        $code = yield $promise;
 
-        $code = yield $process->join();
-
-        $stdout = \implode($stdout->drain());
-        $stderr = \implode($stderr->drain());
+        $stdout = yield $process->getStdout();
+        $stderr = yield $process->getStderr();
 
         if ($code !== 0) {
             $debugInfo = "EXIT: {$code}\n\nSTDOUT\n======\n\n{$stdout}\n\nSTDERR\n======\n\n{$stderr}\n";

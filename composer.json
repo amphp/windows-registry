@@ -4,7 +4,7 @@
     "type": "library",
     "require": {
         "amphp/amp": "dev-master as 2.0",
-        "amphp/parallel": "dev-master as 1.0"
+        "amphp/process": "dev-amp_v2 as 0.2"
     },
     "require-dev": {
         "amphp/loop": "dev-master"
