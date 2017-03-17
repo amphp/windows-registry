@@ -2,9 +2,8 @@
 
 namespace Amp\WindowsRegistry;
 
-use Amp\Coroutine;
+use Amp\{ Coroutine, Promise };
 use Amp\Process\StreamedProcess;
-use AsyncInterop\Promise;
 
 class WindowsRegistry {
     public function read(string $key): Promise {
@@ -45,9 +44,9 @@ class WindowsRegistry {
 
         $cmd = \sprintf("reg query %s", \escapeshellarg($key));
         $process = new StreamedProcess($cmd);
-        $promise = $process->execute();
+        $process->start();
 
-        $code = yield $promise;
+        $code = yield $process->join();
 
         $stdout = yield $process->getStdout();
         $stderr = yield $process->getStderr();
