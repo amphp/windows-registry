@@ -44,14 +44,11 @@ class WindowsRegistry {
             $process = new Process($cmd);
             $process->start();
 
+            $stdout = yield new Message($process->getStdout());
             $code = yield $process->join();
 
-            $stdout = yield new Message($process->getStdout());
-            $stderr = yield new Message($process->getStderr());
-
             if ($code !== 0) {
-                $debugInfo = "EXIT: {$code}\n\nSTDOUT\n======\n\n{$stdout}\n\nSTDERR\n======\n\n{$stderr}\n";
-                throw new \RuntimeException("Unknown error file getting key '{$key}'.\n\n$debugInfo");
+                throw new KeyNotFoundException("Windows registry key '{$key}' not found.");
             }
 
             $lines = \explode("\n", \str_replace("\r", "", $stdout));
