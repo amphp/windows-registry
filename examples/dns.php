@@ -1,12 +1,13 @@
 <?php
 
+use Amp\Loop;
 use Amp\WindowsRegistry\KeyNotFoundException;
 
 require __DIR__ . "/../vendor/autoload.php";
 
 # Read Windows DNS configuration
 
-Amp\run(function () {
+Loop::run(function () {
     $keys = [
         "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Nameserver",
         "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\DhcpNameServer",
