@@ -2,65 +2,64 @@
 
 namespace Amp\WindowsRegistry;
 
-use Amp\{ Coroutine, Promise };
-use Amp\Process\StreamedProcess;
+use Amp\ByteStream\Message;
+use Amp\Process\Process;
+use Amp\Promise;
+use function Amp\call;
 
 class WindowsRegistry {
     public function read(string $key): Promise {
-        return new Coroutine($this->fetch($key));
-    }
+        return call(function () use ($key) {
+            $lines = yield $this->listKeys($key);
 
-    private function fetch(string $key): \Generator {
-        $lines = yield from $this->getKeys($key);
+            $key = \strtr($key, "/", "\\");
+            $parts = \explode("\\", $key);
 
-        $parts = \explode("\\", $key = \strtr($key, "/", "\\"));
+            $value = \array_pop($parts);
+            $key = \implode("\\", $parts);
 
-        $value = \array_pop($parts);
-        $key = \implode("\\", $parts);
+            $values = \array_map(function ($line) {
+                return \preg_split("(\\s+)", \ltrim($line), 3);
+            }, $lines);
 
-        $values = \array_map(function ($line) {
-            return \preg_split("(\\s+)", \ltrim($line), 3);
-        }, $lines);
-
-        foreach ($values as $v) {
-            if ($v[0] === $value) {
-                return $v[2];
+            foreach ($values as $v) {
+                if ($v[0] === $value) {
+                    return $v[2];
+                }
             }
-        }
 
-        throw new KeyNotFoundException("Windows registry key '{$key}\\{$value}' not found.");
+            throw new KeyNotFoundException("Windows registry key '{$key}\\{$value}' not found.");
+        });
     }
 
     public function listKeys(string $key): Promise {
-        return new Coroutine($this->getKeys($key));
-    }
+        return call(function () use ($key) {
+            if (\strtoupper(\substr(\PHP_OS, 0, 3)) !== 'WIN') {
+                throw new \Error("Not running on Windows.");
+            }
 
-    private function getKeys(string $key): \Generator {
-        if (\strtoupper(\substr(\PHP_OS, 0, 3)) !== 'WIN') {
-            throw new \Error("Not running on Windows.");
-        }
+            $key = \strtr($key, "/", "\\");
 
-        $key = \strtr($key, "/", "\\");
+            $cmd = \sprintf("reg query %s", \escapeshellarg($key));
+            $process = new Process($cmd);
+            $process->start();
 
-        $cmd = \sprintf("reg query %s", \escapeshellarg($key));
-        $process = new StreamedProcess($cmd);
-        $process->start();
+            $code = yield $process->join();
 
-        $code = yield $process->join();
+            $stdout = yield new Message($process->getStdout());
+            $stderr = yield new Message($process->getStderr());
 
-        $stdout = yield $process->getStdout();
-        $stderr = yield $process->getStderr();
+            if ($code !== 0) {
+                $debugInfo = "EXIT: {$code}\n\nSTDOUT\n======\n\n{$stdout}\n\nSTDERR\n======\n\n{$stderr}\n";
+                throw new \RuntimeException("Unknown error file getting key '{$key}'.\n\n$debugInfo");
+            }
 
-        if ($code !== 0) {
-            $debugInfo = "EXIT: {$code}\n\nSTDOUT\n======\n\n{$stdout}\n\nSTDERR\n======\n\n{$stderr}\n";
-            throw new \RuntimeException("Unknown error file getting key '{$key}'.\n\n$debugInfo");
-        }
+            $lines = \explode("\n", \str_replace("\r", "", $stdout));
+            $lines = \array_filter($lines, function ($line) {
+                return \strlen($line) && $line[0] !== " ";
+            });
 
-        $lines = \explode("\n", \str_replace("\r", "", $stdout));
-        $lines = \array_filter($lines, function ($line) {
-            return \strlen($line) && $line[0] !== " ";
+            return $lines;
         });
-
-        return $lines;
     }
 }

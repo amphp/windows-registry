@@ -2,12 +2,6 @@
     "name": "amphp/windows-registry",
     "description": "Windows Registry Reader.",
     "type": "library",
-    "require": {
-        "amphp/amp": "dev-master as 2.0",
-        "amphp/process": "dev-amp_v2 as 0.2"
-    },
-    "require-dev": {
-    },
     "license": "MIT",
     "authors": [
         {
@@ -19,5 +13,9 @@
         "psr-4": {
             "Amp\\WindowsRegistry\\": "lib"
         }
+    },
+    "require": {
+        "amphp/amp": "^2",
+        "amphp/process": "^0.2@dev"
     }
 }
