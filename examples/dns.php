@@ -2,6 +2,7 @@
 
 use Amp\Loop;
 use Amp\WindowsRegistry\KeyNotFoundException;
+use Amp\WindowsRegistry\WindowsRegistry;
 
 require __DIR__ . "/../vendor/autoload.php";
 
@@ -9,36 +10,43 @@ require __DIR__ . "/../vendor/autoload.php";
 
 Loop::run(function () {
     $keys = [
-        "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Nameserver",
+        "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\NameServer",
         "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\DhcpNameServer",
     ];
 
-    $reader = new Amp\WindowsRegistry\WindowsRegistry;
-    $value = null;
+    $reader = new WindowsRegistry;
+    $nameserver = "";
 
-    try {
-        while ($key = array_shift($keys)) {
-            try {
-                $value = yield $reader->read($key);
+    while ($nameserver === "" && ($key = \array_shift($keys))) {
+        try {
+            $nameserver = yield $reader->read($key);
+        } catch (KeyNotFoundException $e) { }
+    }
 
-                if ($value !== "") {
-                    break;
-                }
-            } catch (KeyNotFoundException $e) { }
+    if ($nameserver === "") {
+        $subKeys = yield $reader->listKeys("HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces");
+
+        foreach ($subKeys as $key) {
+            foreach (["NameServer", "DhcpNameServer"] as $property) {
+                try {
+                    $nameserver = (yield $reader->read("{$key}\\{$property}"));
+
+                    if ($nameserver !== "") {
+                        break 2;
+                    }
+                } catch (KeyNotFoundException $e) { }
+            }
         }
+    }
 
-        if ($value === null || $value === "") {
-            print "Could not determine current DNS nameserver." . PHP_EOL;
-            exit(1);
-        }
+    if ($nameserver !== "") {
+        // Microsoft documents space as delimiter, AppVeyor uses comma.
+        $nameservers = \array_map(function ($ns) {
+            return \trim($ns) . ":53";
+        }, \explode(" ", \strtr($nameserver, ",", " ")));
 
-        print "Current DNS Nameserver: {$value}" . PHP_EOL;
-        exit(0);
-    } catch (Exception $e) {
-        print "Exception: " . $e->getMessage() . PHP_EOL;
-        exit(2);
-    } catch (Throwable $e) {
-        print "Exception: " . $e->getMessage() . PHP_EOL;
-        exit(2);
+        print "Found nameservers: " . implode(", ", $nameservers) . PHP_EOL;
+    } else {
+        print "No nameservers found." . PHP_EOL;
     }
 });
