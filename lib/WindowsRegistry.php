@@ -10,13 +10,17 @@ use function Amp\call;
 class WindowsRegistry {
     public function read(string $key): Promise {
         return call(function () use ($key) {
-            $lines = yield $this->listKeys($key);
-
             $key = \strtr($key, "/", "\\");
             $parts = \explode("\\", $key);
 
             $value = \array_pop($parts);
             $key = \implode("\\", $parts);
+
+            $lines = yield $this->query($key);
+
+            $lines = array_filter($lines, function ($line) {
+                return strlen($line) && $line[0] === " ";
+            });
 
             $values = \array_map(function ($line) {
                 return \preg_split("(\\s+)", \ltrim($line), 3);
@@ -33,6 +37,18 @@ class WindowsRegistry {
     }
 
     public function listKeys(string $key): Promise {
+        return call(function () use ($key) {
+            $lines = yield $this->query($key);
+
+            $lines = \array_filter($lines, function ($line) {
+                return \strlen($line) && $line[0] !== " ";
+            });
+
+            return $lines;
+        });
+    }
+
+    private function query(string $key): Promise {
         return call(function () use ($key) {
             if (\strtoupper(\substr(\PHP_OS, 0, 3)) !== 'WIN') {
                 throw new \Error("Not running on Windows.");
@@ -51,12 +67,7 @@ class WindowsRegistry {
                 throw new KeyNotFoundException("Windows registry key '{$key}' not found.");
             }
 
-            $lines = \explode("\n", \str_replace("\r", "", $stdout));
-            $lines = \array_filter($lines, function ($line) {
-                return \strlen($line) && $line[0] !== " ";
-            });
-
-            return $lines;
+            return \explode("\n", \str_replace("\r", "", $stdout));
         });
     }
 }
