@@ -20,7 +20,8 @@ Loop::run(function () {
     while ($nameserver === "" && ($key = \array_shift($keys))) {
         try {
             $nameserver = yield $reader->read($key);
-        } catch (KeyNotFoundException $e) { }
+        } catch (KeyNotFoundException $e) {
+        }
     }
 
     if ($nameserver === "") {
@@ -34,7 +35,8 @@ Loop::run(function () {
                     if ($nameserver !== "") {
                         break 2;
                     }
-                } catch (KeyNotFoundException $e) { }
+                } catch (KeyNotFoundException $e) {
+                }
             }
         }
     }
