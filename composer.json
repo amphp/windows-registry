@@ -16,6 +16,6 @@
     },
     "require": {
         "amphp/amp": "^2",
-        "amphp/process": "^0.2@dev"
+        "amphp/process": "^0.2"
     }
 }
