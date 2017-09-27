@@ -4,9 +4,10 @@ kramdown:
 
 baseurl: "/windows-registry"
 layouts_dir: ".shared/layout"
+includes_dir: ".shared/includes"
 
 exclude: ["Gemfile", "Gemfile.lock", "README.md", "vendor"]
-include: [".shared"]
+safe: true
 
 repository: amphp/windows-registry
 gems:
@@ -19,5 +20,7 @@ defaults:
      type: "pages"
    values:
      layout: "docs"
+     description: "amphp/windows-registry provides asynchronous access to the Windows Registry for Amp."
+     keywords: ["amphp", "amp", "windows", "windows-registry", "async", "php"]
 
-asset_path: "/windows-registry/.shared/asset"
+shared_asset_path: "/windows-registry/asset"
