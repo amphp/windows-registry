@@ -1,6 +1,6 @@
 # windows-registry
 
-[![Release](https://img.shields.io/github/release/amphp/process.svg?style=flat-square)](https://github.com/amphp/process/releases)
+[![Release](https://img.shields.io/github/release/amphp/windows-registry.svg?style=flat-square)](https://github.com/amphp/windows-registry/releases)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)
 
 `amphp/windows-registry` provides asynchronous access to the Windows Registry for [Amp](https://github.com/amphp/amp).
