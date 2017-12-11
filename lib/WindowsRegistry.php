@@ -10,7 +10,7 @@ use function Amp\call;
 class WindowsRegistry {
     public function read(string $key): Promise {
         return call(function () use ($key) {
-            $key = \strtr($key, "/", "\\");
+            $key = \strtr($key, '/', "\\");
             $parts = \explode("\\", $key);
 
             $value = \array_pop($parts);
@@ -19,7 +19,7 @@ class WindowsRegistry {
             $lines = yield $this->query($key);
 
             $lines = array_filter($lines, function ($line) {
-                return strlen($line) && $line[0] === " ";
+                return '' !== $line && $line[0] === ' ';
             });
 
             $values = \array_map(function ($line) {
@@ -41,7 +41,7 @@ class WindowsRegistry {
             $lines = yield $this->query($key);
 
             $lines = \array_filter($lines, function ($line) {
-                return \strlen($line) && $line[0] !== " ";
+                return '' !== $line && $line[0] !== ' ';
             });
 
             return $lines;
@@ -50,13 +50,13 @@ class WindowsRegistry {
 
     private function query(string $key): Promise {
         return call(function () use ($key) {
-            if (\strtoupper(\substr(\PHP_OS, 0, 3)) !== 'WIN') {
-                throw new \Error("Not running on Windows.");
+            if (0 !== stripos(\PHP_OS, 'WIN')) {
+                throw new \Error('Not running on Windows.');
             }
 
-            $key = \strtr($key, "/", "\\");
+            $key = \strtr($key, '/', "\\");
 
-            $cmd = \sprintf("reg query %s", \escapeshellarg($key));
+            $cmd = \sprintf('reg query %s', \escapeshellarg($key));
             $process = new Process($cmd);
             $process->start();
 
@@ -67,7 +67,7 @@ class WindowsRegistry {
                 throw new KeyNotFoundException("Windows registry key '{$key}' not found.");
             }
 
-            return \explode("\n", \str_replace("\r", "", $stdout));
+            return \explode("\n", \str_replace("\r", '', $stdout));
         });
     }
 }
