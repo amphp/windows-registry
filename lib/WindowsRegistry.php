@@ -2,7 +2,7 @@
 
 namespace Amp\WindowsRegistry;
 
-use Amp\ByteStream\Message;
+use Amp\ByteStream;
 use Amp\Process\Process;
 use Amp\Promise;
 use function Amp\call;
@@ -58,9 +58,9 @@ class WindowsRegistry {
 
             $cmd = \sprintf('reg query %s', \escapeshellarg($key));
             $process = new Process($cmd);
-            $process->start();
+            yield $process->start();
 
-            $stdout = yield new Message($process->getStdout());
+            $stdout = yield ByteStream\buffer($process->getStdout());
             $code = yield $process->join();
 
             if ($code !== 0) {
