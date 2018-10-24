@@ -7,8 +7,10 @@ use Amp\Process\Process;
 use Amp\Promise;
 use function Amp\call;
 
-class WindowsRegistry {
-    public function read(string $key): Promise {
+class WindowsRegistry
+{
+    public function read(string $key): Promise
+    {
         return call(function () use ($key) {
             $key = \strtr($key, '/', "\\");
             $parts = \explode("\\", $key);
@@ -18,7 +20,7 @@ class WindowsRegistry {
 
             $lines = yield $this->query($key);
 
-            $lines = array_filter($lines, function ($line) {
+            $lines = \array_filter($lines, function ($line) {
                 return '' !== $line && $line[0] === ' ';
             });
 
@@ -36,7 +38,8 @@ class WindowsRegistry {
         });
     }
 
-    public function listKeys(string $key): Promise {
+    public function listKeys(string $key): Promise
+    {
         return call(function () use ($key) {
             $lines = yield $this->query($key);
 
@@ -48,9 +51,10 @@ class WindowsRegistry {
         });
     }
 
-    private function query(string $key): Promise {
+    private function query(string $key): Promise
+    {
         return call(function () use ($key) {
-            if (0 !== stripos(\PHP_OS, 'WIN')) {
+            if (0 !== \stripos(\PHP_OS, 'WIN')) {
                 throw new \Error('Not running on Windows.');
             }
 

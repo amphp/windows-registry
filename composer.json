@@ -20,7 +20,7 @@
         "amphp/process": "^1"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.3"
+        "amphp/php-cs-fixer-config": "dev-master"
     },
     "config": {
         "platform": {
