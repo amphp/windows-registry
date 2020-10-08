@@ -4,84 +4,76 @@ namespace Amp\WindowsRegistry;
 
 use Amp\ByteStream;
 use Amp\Process\Process;
-use Amp\Promise;
-use function Amp\call;
 
-class WindowsRegistry
+final class WindowsRegistry
 {
-    public function read(string $key): Promise
+    public function read(string $key): ?string
     {
-        return call(function () use ($key) {
-            $key = \strtr($key, '/', "\\");
-            $parts = \explode("\\", $key);
+        $key = \strtr($key, '/', "\\");
+        $parts = \explode("\\", $key);
 
-            $value = \array_pop($parts);
-            $key = \implode("\\", $parts);
+        $value = \array_pop($parts);
+        $key = \implode("\\", $parts);
 
-            $lines = yield $this->query($key);
+        $lines = $this->query($key);
 
-            $lines = \array_filter($lines, function ($line) {
-                return '' !== $line && $line[0] === ' ';
-            });
+        $lines = \array_filter($lines, function ($line) {
+            return '' !== $line && $line[0] === ' ';
+        });
 
-            $values = \array_map(function ($line) {
-                return \preg_split("(\\s+)", \ltrim($line), 3);
-            }, $lines);
+        $values = \array_map(function ($line) {
+            return \preg_split("(\\s+)", \ltrim($line), 3);
+        }, $lines);
 
-            $foundValue = null;
+        $foundValue = null;
 
-            foreach ($values as $v) {
-                if ($v[0] === $value) {
-                    if (\count($v) >= 3) {
-                        return $v[2];
-                    }
-
-                    $foundValue = $v;
+        foreach ($values as $v) {
+            if ($v[0] === $value) {
+                if (\count($v) >= 3) {
+                    return $v[2];
                 }
-            }
 
-            if ($foundValue) {
-                throw new KeyNotFoundException("Windows registry key '{$key}\\{$value}' was found, but could not be read correctly, got " . \var_export($foundValue, true));
+                $foundValue = $v;
             }
+        }
 
-            throw new KeyNotFoundException("Windows registry key '{$key}\\{$value}' not found.");
-        });
+        if ($foundValue) {
+            throw new KeyNotFoundException("Windows registry key '{$key}\\{$value}' was found, but could not be read correctly, got " . \var_export($foundValue, true));
+        }
+
+        throw new KeyNotFoundException("Windows registry key '{$key}\\{$value}' not found.");
     }
 
-    public function listKeys(string $key): Promise
+    public function listKeys(string $key): array
     {
-        return call(function () use ($key) {
-            $lines = yield $this->query($key);
+        $lines = $this->query($key);
 
-            $lines = \array_filter($lines, function ($line) {
-                return '' !== $line && $line[0] !== ' ';
-            });
-
-            return $lines;
+        $lines = \array_filter($lines, function ($line) {
+            return '' !== $line && $line[0] !== ' ';
         });
+
+        return $lines;
     }
 
-    private function query(string $key): Promise
+    private function query(string $key): array
     {
-        return call(function () use ($key) {
-            if (0 !== \stripos(\PHP_OS, 'WIN')) {
-                throw new \Error('Not running on Windows.');
-            }
+        if (0 !== \stripos(\PHP_OS, 'WIN')) {
+            throw new \Error('Not running on Windows.');
+        }
 
-            $key = \strtr($key, '/', "\\");
+        $key = \strtr($key, '/', "\\");
 
-            $cmd = \sprintf('reg query %s', \escapeshellarg($key));
-            $process = new Process($cmd);
-            yield $process->start();
+        $cmd = \sprintf('reg query %s', \escapeshellarg($key));
+        $process = new Process($cmd);
+        $process->start();
 
-            $stdout = yield ByteStream\buffer($process->getStdout());
-            $code = yield $process->join();
+        $stdout = ByteStream\buffer($process->getStdout());
+        $code = $process->join();
 
-            if ($code !== 0) {
-                throw new KeyNotFoundException("Windows registry key '{$key}' not found.");
-            }
+        if ($code !== 0) {
+            throw new KeyNotFoundException("Windows registry key '{$key}' not found.");
+        }
 
-            return \explode("\n", \str_replace("\r", '', $stdout));
-        });
+        return \explode("\n", \str_replace("\r", '', $stdout));
     }
 }

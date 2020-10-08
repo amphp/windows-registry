@@ -2,6 +2,6 @@
 
 namespace Amp\WindowsRegistry;
 
-class KeyNotFoundException extends \Exception
+final class KeyNotFoundException extends \Exception
 {
 }

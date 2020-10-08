@@ -15,16 +15,11 @@
         }
     },
     "require": {
-        "amphp/amp": "^2",
-        "amphp/byte-stream": "^1.4",
-        "amphp/process": "^1"
+        "amphp/amp": "^3-dev",
+        "amphp/byte-stream": "^2-dev",
+        "amphp/process": "^2-dev"
     },
     "require-dev": {
         "amphp/php-cs-fixer-config": "dev-master"
-    },
-    "config": {
-        "platform": {
-            "php": "7.0.0"
-        }
     }
 }
