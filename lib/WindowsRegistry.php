@@ -17,11 +17,11 @@ final class WindowsRegistry
 
         $lines = $this->query($key);
 
-        $lines = \array_filter($lines, function ($line) {
+        $lines = \array_filter($lines, static function ($line) {
             return '' !== $line && $line[0] === ' ';
         });
 
-        $values = \array_map(function ($line) {
+        $values = \array_map(static function ($line) {
             return \preg_split("(\\s+)", \ltrim($line), 3);
         }, $lines);
 
@@ -38,7 +38,8 @@ final class WindowsRegistry
         }
 
         if ($foundValue) {
-            throw new KeyNotFoundException("Windows registry key '{$key}\\{$value}' was found, but could not be read correctly, got " . \var_export($foundValue, true));
+            throw new KeyNotFoundException("Windows registry key '{$key}\\{$value}' was found, but could not be read correctly, got " . \var_export($foundValue,
+                    true));
         }
 
         throw new KeyNotFoundException("Windows registry key '{$key}\\{$value}' not found.");
@@ -48,7 +49,7 @@ final class WindowsRegistry
     {
         $lines = $this->query($key);
 
-        $lines = \array_filter($lines, function ($line) {
+        $lines = \array_filter($lines, static function ($line) {
             return '' !== $line && $line[0] !== ' ';
         });
 

@@ -14,10 +14,18 @@
             "Amp\\WindowsRegistry\\": "lib"
         }
     },
+    "prefer-stable": true,
+    "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:revolt-php/event-loop.git"
+        }
+    ],
     "require": {
-        "amphp/amp": "^3-dev",
-        "amphp/byte-stream": "^2-dev",
-        "amphp/process": "^2-dev"
+        "amphp/amp": "dev-v3-revolt",
+        "amphp/byte-stream": "dev-v2-revolt",
+        "amphp/process": "dev-v2-revolt"
     },
     "require-dev": {
         "amphp/php-cs-fixer-config": "dev-master"
