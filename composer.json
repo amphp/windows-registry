@@ -11,23 +11,18 @@
     ],
     "autoload": {
         "psr-4": {
-            "Amp\\WindowsRegistry\\": "lib"
+            "Amp\\WindowsRegistry\\": "src"
         }
     },
     "prefer-stable": true,
-    "minimum-stability": "dev",
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "git@github.com:revolt-php/event-loop.git"
-        }
-    ],
+    "minimum-stability": "beta",
     "require": {
-        "amphp/amp": "dev-v3-revolt",
-        "amphp/byte-stream": "dev-v2-revolt",
-        "amphp/process": "dev-v2-revolt"
+        "php": ">=8",
+        "amphp/byte-stream": "^2",
+        "amphp/process": "^2"
     },
     "require-dev": {
-        "amphp/php-cs-fixer-config": "dev-master"
+        "amphp/php-cs-fixer-config": "dev-master",
+        "psalm/phar": "^4.15"
     }
 }

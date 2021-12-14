@@ -38,8 +38,10 @@ final class WindowsRegistry
         }
 
         if ($foundValue) {
-            throw new KeyNotFoundException("Windows registry key '{$key}\\{$value}' was found, but could not be read correctly, got " . \var_export($foundValue,
-                    true));
+            throw new KeyNotFoundException("Windows registry key '{$key}\\{$value}' was found, but could not be read correctly, got " . \var_export(
+                $foundValue,
+                true
+            ));
         }
 
         throw new KeyNotFoundException("Windows registry key '{$key}\\{$value}' not found.");
@@ -58,20 +60,15 @@ final class WindowsRegistry
 
     private function query(string $key): array
     {
-        if (0 !== \stripos(\PHP_OS, 'WIN')) {
-            throw new \Error('Not running on Windows.');
+        if (\PHP_OS_FAMILY !== 'Windows') {
+            throw new \Error('Not running on Windows: ' . \PHP_OS_FAMILY);
         }
 
-        $key = \strtr($key, '/', "\\");
-
-        $cmd = \sprintf('reg query %s', \escapeshellarg($key));
-        $process = new Process($cmd);
-        $process->start();
-
+        $process = Process::start(['reg', 'query', \strtr($key, '/', "\\")]);
         $stdout = ByteStream\buffer($process->getStdout());
-        $code = $process->join();
+        $exitCode = $process->join();
 
-        if ($code !== 0) {
+        if ($exitCode !== 0) {
             throw new KeyNotFoundException("Windows registry key '{$key}' not found.");
         }
 
