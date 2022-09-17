@@ -1,19 +1,26 @@
-# windows-registry
+# amphp/windows-registry
+
+AMPHP is a collection of event-driven libraries for PHP designed with fibers and concurrency in mind.
+`amphp/windows-registry` provides asynchronous access to the Windows Registry.
 
 [![Release](https://img.shields.io/github/release/amphp/windows-registry.svg?style=flat-square)](https://github.com/amphp/windows-registry/releases)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)
 
-`amphp/windows-registry` provides asynchronous access to the Windows Registry for [Amp](https://github.com/amphp/amp).
-
 ## Installation
+
+This package can be installed as a [Composer](https://getcomposer.org/) dependency.
 
 ```bash
 composer require amphp/windows-registry
 ```
 
-## Documentation
+## Usage
 
-Documentation is bundled within this repository in the [`./docs`](./docs) directory.
+`WindowsRegistry` has the two methods `listKeys` and `read`:
+
+ - `listKeys` fetches all sub-keys of one key.
+ - `read` reads the value of the key.
+   Note that `read` doesn't convert any values and returns them as they're printed by `reg query %s`.
 
 ## Versioning
 
