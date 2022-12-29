@@ -17,12 +17,12 @@
     "prefer-stable": true,
     "minimum-stability": "beta",
     "require": {
-        "php": ">=8",
+        "php": ">=8.1",
         "amphp/byte-stream": "^2",
         "amphp/process": "^2"
     },
     "require-dev": {
-        "amphp/php-cs-fixer-config": "dev-master",
+        "amphp/php-cs-fixer-config": "^2",
         "psalm/phar": "^4.15"
     }
 }

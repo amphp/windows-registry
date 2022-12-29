@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Amp\WindowsRegistry;
 
@@ -9,7 +9,7 @@ final class WindowsRegistry
 {
     public function read(string $key): ?string
     {
-        $key = \strtr($key, '/', "\\");
+        $key = \str_replace('/', "\\", $key);
         $parts = \explode("\\", $key);
 
         $value = \array_pop($parts);
@@ -51,11 +51,9 @@ final class WindowsRegistry
     {
         $lines = $this->query($key);
 
-        $lines = \array_filter($lines, static function ($line) {
+        return \array_filter($lines, static function ($line) {
             return '' !== $line && $line[0] !== ' ';
         });
-
-        return $lines;
     }
 
     private function query(string $key): array
@@ -64,7 +62,7 @@ final class WindowsRegistry
             throw new \Error('Not running on Windows: ' . \PHP_OS_FAMILY);
         }
 
-        $process = Process::start(['reg', 'query', \strtr($key, '/', "\\")]);
+        $process = Process::start(['reg', 'query', \str_replace('/', "\\", $key)]);
         $stdout = ByteStream\buffer($process->getStdout());
         $exitCode = $process->join();
 

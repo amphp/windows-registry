@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use Amp\WindowsRegistry\KeyNotFoundException;
 use Amp\WindowsRegistry\WindowsRegistry;
@@ -15,7 +15,7 @@ $keys = [
 $reader = new WindowsRegistry;
 $nameserver = "";
 
-while ($nameserver === "" && ($key = \array_shift($keys))) {
+while ($nameserver === "" && ($key = array_shift($keys))) {
     try {
         $nameserver = $reader->read($key) ?? '';
     } catch (KeyNotFoundException $e) {
@@ -41,11 +41,11 @@ if ($nameserver === "") {
 
 if ($nameserver !== "") {
     // Microsoft documents space as delimiter, AppVeyor uses comma.
-    $nameservers = \array_map(function ($ns) {
-        return \trim($ns) . ":53";
-    }, \explode(" ", \strtr($nameserver, ",", " ")));
+    $nameservers = array_map(function ($ns) {
+        return trim($ns) . ":53";
+    }, explode(" ", strtr($nameserver, ",", " ")));
 
-    print "Found nameservers: " . \implode(", ", $nameservers) . PHP_EOL;
+    print "Found nameservers: " . implode(", ", $nameservers) . PHP_EOL;
 } else {
     print "No nameservers found." . PHP_EOL;
 }
