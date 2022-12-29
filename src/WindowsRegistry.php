@@ -3,10 +3,15 @@
 namespace Amp\WindowsRegistry;
 
 use Amp\ByteStream;
+use Amp\ForbidCloning;
+use Amp\ForbidSerialization;
 use Amp\Process\Process;
 
 final class WindowsRegistry
 {
+    use ForbidCloning;
+    use ForbidSerialization;
+
     public function read(string $key): ?string
     {
         $key = \str_replace('/', "\\", $key);
