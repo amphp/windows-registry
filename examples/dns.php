@@ -12,23 +12,22 @@ $keys = [
     "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\DhcpNameServer",
 ];
 
-$reader = new WindowsRegistry;
 $nameserver = "";
 
 while ($nameserver === "" && ($key = array_shift($keys))) {
     try {
-        $nameserver = $reader->read($key) ?? '';
+        $nameserver = WindowsRegistry::read($key) ?? '';
     } catch (KeyNotFoundException $e) {
     }
 }
 
 if ($nameserver === "") {
-    $subKeys = $reader->listKeys("HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces");
+    $subKeys = WindowsRegistry::listKeys("HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces");
 
     foreach ($subKeys as $key) {
         foreach (["NameServer", "DhcpNameServer"] as $property) {
             try {
-                $nameserver = $reader->read("{$key}\\{$property}") ?? '';
+                $nameserver = WindowsRegistry::read("{$key}\\{$property}") ?? '';
 
                 if ($nameserver !== "") {
                     break 2;
