@@ -14,8 +14,6 @@
             "Amp\\WindowsRegistry\\": "src"
         }
     },
-    "prefer-stable": true,
-    "minimum-stability": "beta",
     "require": {
         "php": ">=8.1",
         "amphp/byte-stream": "^2",
