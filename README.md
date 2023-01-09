@@ -16,7 +16,7 @@ composer require amphp/windows-registry
 
 ## Usage
 
-`WindowsRegistry` has the two methods `listKeys` and `read`:
+`WindowsRegistry` has the two static methods `listKeys` and `read`:
 
  - `listKeys` fetches all sub-keys of one key.
  - `read` reads the value of the key.

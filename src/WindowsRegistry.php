@@ -12,7 +12,12 @@ final class WindowsRegistry
     use ForbidCloning;
     use ForbidSerialization;
 
-    public function read(string $key): ?string
+    private function __construct()
+    {
+        // forbid instances
+    }
+
+    public static function read(string $key): ?string
     {
         $key = \str_replace('/', "\\", $key);
         $parts = \explode("\\", $key);
@@ -20,7 +25,7 @@ final class WindowsRegistry
         $value = \array_pop($parts);
         $key = \implode("\\", $parts);
 
-        $lines = $this->query($key);
+        $lines = self::query($key);
 
         $lines = \array_filter($lines, static function ($line) {
             return '' !== $line && $line[0] === ' ';
@@ -52,16 +57,16 @@ final class WindowsRegistry
         throw new KeyNotFoundException("Windows registry key '{$key}\\{$value}' not found.");
     }
 
-    public function listKeys(string $key): array
+    public static function listKeys(string $key): array
     {
-        $lines = $this->query($key);
+        $lines = self::query($key);
 
         return \array_filter($lines, static function ($line) {
             return '' !== $line && $line[0] !== ' ';
         });
     }
 
-    private function query(string $key): array
+    private static function query(string $key): array
     {
         if (\PHP_OS_FAMILY !== 'Windows') {
             throw new \Error('Not running on Windows: ' . \PHP_OS_FAMILY);
