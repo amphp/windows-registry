@@ -17,7 +17,7 @@ final class WindowsRegistry
         // forbid instances
     }
 
-    public static function read(string $key): ?string
+    public static function read(string $key): string
     {
         $key = \str_replace('/', "\\", $key);
         $parts = \explode("\\", $key);
